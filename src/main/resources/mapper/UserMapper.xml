@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.loginAuth.mapper.UserMapper">
+
+	<!-- Find user by email -->
+	<select id="findByEmail" parameterType="map"
+		resultType="com.loginAuth.dto.UserDto">
+		SELECT *
+		FROM USERS
+		WHERE email = #{email}
+	</select>
+
+	<!-- Save new user -->
+	<insert id="save">INSERT INTO users(email, password) VALUES(#{email},
+		#{password})
+	</insert>
+
+	<!-- Save reset token and expiry time -->
+	<update id="saveResetToken">
+		UPDATE users
+		SET reset_token = #{token},
+		token_expiry =
+		#{expiry}
+		WHERE email = #{email}
+	</update>
+
+	<!-- Find user by reset token (only if token is not expired) -->
+	<select id="findByToken" resultType="UserDto">
+		SELECT *
+		FROM users
+		WHERE
+		reset_token = #{token}
+		AND token_expiry > SYSTIMESTAMP
+	</select>
+
+	<!-- Update password -->
+	<update id="updatePassword">
+		UPDATE users
+		SET password = #{password}
+		WHERE email =
+		#{email}
+	</update>
+
+	<!-- Clear reset token after successful password reset -->
+	<update id="clearResetToken">
+		UPDATE users
+		SET reset_token = NULL,
+		token_expiry =
+		NULL
+		WHERE email = #{email}
+	</update>
+
+</mapper>
